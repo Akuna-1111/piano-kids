@@ -1,0 +1,137 @@
+/* 曲谱导入（家长页）—— 只用既有语义 Token，不引入新的视觉语言 */
+
+.im {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: var(--space-4);
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+}
+
+.im__lead {
+  margin: 0;
+  font-size: var(--font-size-label);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+.im__field {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: var(--space-1);
+}
+
+.im__field--grow {
+  flex: 1 1 auto;
+}
+
+.im__row {
+  display: flex;
+  min-width: 0;
+  gap: var(--space-3);
+}
+
+.im__label {
+  font-size: var(--font-size-micro);
+  color: var(--color-text-secondary);
+}
+
+.im__textarea,
+.im__input {
+  width: 100%;
+  min-width: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-size-label);
+  /* 家长要在这里打字 / 粘贴：允许选文字由 .is-selectable 负责（§8），
+     这里自己不写 user-select —— 那条规则由 browser-compat 守卫拦。 */
+}
+
+/* 简谱用等宽字体对齐，家长容易核对 */
+.im__textarea {
+  font-family: var(--font-family-mono, ui-monospace, monospace);
+  line-height: var(--line-height-relaxed);
+  resize: vertical;
+}
+
+.im__input--num {
+  width: 88px;
+}
+
+.im__hint {
+  margin: 0;
+  font-size: var(--font-size-micro);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+.im__hint code {
+  font-family: var(--font-family-mono, ui-monospace, monospace);
+  color: var(--color-text);
+}
+
+.im__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.im__report {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.im__ok,
+.im__warn,
+.im__error {
+  margin: 0;
+  font-size: var(--font-size-label);
+  line-height: var(--line-height-relaxed);
+}
+
+.im__ok {
+  color: var(--color-accent-strong);
+}
+
+.im__warn {
+  color: var(--color-text-secondary);
+}
+
+.im__error {
+  color: var(--color-danger, #a33a2a);
+}
+
+.im__heading {
+  margin: var(--space-3) 0 0;
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+
+.im__packs {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.im__pack {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-label);
+}

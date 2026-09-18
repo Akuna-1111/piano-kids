@@ -1,0 +1,142 @@
+/* ============================================================
+   Base — reset、排版、通用 UI 原语
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  /* 字体栈依据 §6.1，不主动加载大体积中文 Web Font */
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei',
+    'Noto Sans SC', sans-serif;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body);
+  -webkit-font-smoothing: antialiased;
+  /* 触摸键盘时不要出现选择/放大镜/双击缩放带来的干扰 */
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+/* ---------- 长按行为：整个应用都不允许系统「选取文字」 ----------
+   （硬性规则，见 AGENTS.md §8；有 browser-compat 守卫测试）
+
+   为什么必须是**文档根节点**级别，而不是只给按钮和琴键加：
+
+   `user-select` 是**继承**属性。只写在 `.pk` 与 `button` 上时，
+   长按仍然可以落在没有该声明的文字节点上（音符卡片、提示文案、页面留白），
+   iOS Safari 一旦进入选择模式就会弹出放大镜、并**吃掉后续的 pointer 事件**。
+   表现就是「按住琴键按久一点，音就哑了」—— 这不是样式问题，是交互被系统抢走。
+
+   这一页的主要使用方式就是「按住不放」，所以长按必须完全属于应用自己。
+
+   极少数确实需要可选文字的地方（例如让家长复制自检页的读数）加 `.is-selectable`。 */
+html,
+body,
+#root {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.is-selectable {
+  user-select: text;
+  -webkit-user-select: text;
+  -webkit-touch-callout: default;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ---------- 通用 UI 原语 ---------- */
+
+.ui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--tap-target);
+  padding: 0 var(--space-5);
+  /* §7.1：大型容器最多 20px，不要所有元素都用 999px */
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  transition: transform var(--motion-press) var(--ease-standard),
+    background-color var(--motion-button) linear, border-color var(--motion-button) linear;
+  touch-action: manipulation;
+}
+
+.ui-btn:active {
+  transform: scale(0.97);
+}
+
+.ui-btn--primary {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-text-on-accent);
+}
+
+.ui-btn--ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--color-text-secondary);
+}
+
+.ui-btn--lg {
+  min-height: 68px;
+  padding: 0 var(--space-6);
+  font-size: var(--font-size-h2);
+  border-radius: var(--radius-lg);
+}
+
+.ui-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.ui-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-soft);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+}

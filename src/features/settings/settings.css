@@ -1,0 +1,164 @@
+/* ============================================================
+   设置
+   ============================================================ */
+
+.settings__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: var(--content-max-width);
+  /* 有 max-width 的内容容器**必须居中**：否则宽屏上会缩在左边、
+     右边空一大片（实测 iPad 竖屏右空 106px、横屏 360px），看起来像「孤立的一张卡片」 */
+  margin: 0 auto;
+}
+
+.settings__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  /* 不再是卡片：没有填充、没有边框、没有圆角（§3.3 不要把每个模块都做成卡片）。
+     分段改用一条极淡的细线 —— 与装扮页的分节语言一致，也比阴影安静（§7.3）。 */
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.settings__group:first-of-type {
+  padding-top: 0;
+  border-top: none;
+}
+
+.settings__group-title {
+  margin: 0;
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-tight);
+}
+
+.settings__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: 44px;
+}
+
+.settings__row--switch {
+  justify-content: space-between;
+}
+
+.settings__label {
+  flex: 0 0 auto;
+  min-width: 108px;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+}
+
+.settings__value {
+  flex: 0 0 auto;
+  min-width: 48px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-label);
+}
+
+.settings__slider {
+  flex: 1 1 auto;
+  accent-color: var(--color-accent);
+  height: 32px;
+}
+
+.settings__switch {
+  width: 26px;
+  height: 26px;
+  accent-color: var(--color-accent);
+}
+
+.settings__segmented {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  background: var(--color-surface-soft);
+  border-radius: var(--radius-md);
+}
+
+.settings__seg-btn {
+  padding: 9px 16px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  transition: background var(--motion-press) linear, color var(--motion-press) linear;
+}
+
+.settings__seg-btn.is-active {
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-contact);
+}
+
+.settings__note {
+  margin: 0;
+  font-size: var(--font-size-micro);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+.settings__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.settings__stats > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-soft);
+}
+
+.settings__stats dt {
+  font-size: var(--font-size-micro);
+  color: var(--color-text-secondary);
+}
+
+.settings__stats dd {
+  margin: 0;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.settings__sub {
+  display: block;
+  font-size: var(--font-size-micro);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.settings__danger {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.settings__danger-actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.settings__danger-confirm {
+  background: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.settings__about {
+  margin: 0 0 var(--space-5);
+  font-size: var(--font-size-micro);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+}

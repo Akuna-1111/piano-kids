@@ -1,0 +1,20 @@
+{
+  "files": {
+    "src/features/home/home.css": [
+      { "selector": ".home__bar", "set": { "padding": "var(--space-2) var(--space-4)", "min-height": "64px" } },
+      { "selector": ".home__stage", "set": { "padding": "var(--space-3) var(--space-4) max(var(--space-3), env(safe-area-inset-bottom))" } }
+    ],
+    "src/features/practice/practice.css": [
+      { "selector": ".pp", "set": { "padding": "0 var(--space-4) max(var(--space-3), env(safe-area-inset-bottom))" } }
+    ],
+    "src/features/challenges/challenges.css": [
+      { "selector": ".chl", "set": { "padding": "0 var(--space-4) max(var(--space-3), env(safe-area-inset-bottom))" } }
+    ],
+    "src/features/settings/settings.css": [
+      { "selector": ".settings__body", "set": { "gap": "var(--space-4)" } }
+    ],
+    "src/features/import/import.css": [{ "selector": ".im", "set": { "gap": "var(--space-4)" } }],
+    "src/features/tuning/tuning.css": [{ "selector": ".tune__body", "set": { "gap": "var(--space-4)" } }],
+    "src/features/skins/skins.css": [{ "selector": ".wardrobe__body", "set": { "gap": "var(--space-4)" } }]
+  }
+}

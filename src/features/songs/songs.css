@@ -1,0 +1,162 @@
+/* ============================================================
+   曲目列表
+   ============================================================ */
+
+.songs__filters {
+  display: flex;
+  gap: var(--space-2);
+  margin: var(--space-2) 0 var(--space-3);
+  flex-wrap: wrap;
+}
+
+.songs__filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  transition: background var(--motion-press) linear, color var(--motion-press) linear,
+    border-color var(--motion-press) linear;
+}
+
+.songs__filter.is-active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-text-on-accent);
+}
+
+.songs__filter-count {
+  font-size: var(--font-size-micro);
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+}
+
+.songs__hint {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-label);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+.songs__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.song-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  width: 100%;
+  min-height: 84px;
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  text-align: left;
+  transition: transform var(--motion-press) var(--ease-standard),
+    border-color var(--motion-button) linear;
+}
+
+.song-card:active {
+  transform: scale(0.985);
+}
+
+.song-card.is-done {
+  border-color: var(--color-success-border);
+}
+
+.song-card__main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.song-card__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-semibold);
+}
+
+.song-card__check {
+  color: var(--color-success);
+}
+
+.song-card__subtitle {
+  font-size: var(--font-size-label);
+  color: var(--color-text-secondary);
+}
+
+.song-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.song-card__tag {
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-soft);
+  font-size: var(--font-size-micro);
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.song-card__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.song-card__difficulty {
+  display: flex;
+  gap: 4px;
+}
+
+.song-card__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-text-faint);
+}
+
+.song-card__dot.is-on {
+  background: var(--color-accent);
+}
+
+.song-card__best {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-success);
+  font-size: var(--font-size-label);
+}
+
+
+
+.songs__footnote {
+  margin: var(--space-5) 0 0;
+  font-size: var(--font-size-micro);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+@media (min-width: 900px) {
+  .songs__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

@@ -1,0 +1,495 @@
+/* ============================================================
+   练习页 + 完成页
+   横屏优先：键盘占据主要高度，控件只出现在上下两条固定栏里。
+   ============================================================ */
+
+.pp {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100%;
+  min-height: 0;
+  padding: 0 var(--space-4) max(var(--space-3), env(safe-area-inset-bottom));
+  gap: var(--space-3);
+  background: var(--skin-stage-bg);
+}
+
+/* ---------------- 顶部栏 ---------------- */
+
+.pp__top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 64px;
+}
+
+.pp__back {
+  flex: 0 0 auto;
+  padding: 0 var(--space-3);
+}
+
+.pp__title {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.pp__title-name {
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pp__title-meta {
+  font-size: var(--font-size-micro);
+  color: var(--color-text-secondary);
+}
+
+.pp__top-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 0 0 auto;
+}
+
+/* 速度档的分段控件 */
+.pp__tempo,
+
+
+.pp__tempo-btn,
+
+
+.pp__tempo-btn.is-active,
+
+
+/* ---------------- 舞台 ---------------- */
+
+.pp__stage {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  min-height: 0;
+  min-width: 0;}
+
+.pp__prompt {
+  min-height: 84px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+
+.pp__note-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* 跟弹模式的谱面（§5 识谱）。
+   它是「要看的东西」，所以横向铺满；但**上限用视口高度**表达：
+   横屏 iPad 只有 810px 高，谱面必须让位给琴键（§9：键盘拿走剩余空间）。 */
+.pp__staff {
+  width: 100%;
+  max-height: 24vh;
+}
+
+/* 当前音的音名。谱面本身只有符头与唱名/简谱标注，没有字母，
+   所以这里留一行小字 —— 琴键上虽然有字母，但那个要低头找。 */
+.pp__note-current {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-none);
+  color: var(--skin-guide);
+}
+
+.pp__note-next {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.pp__note-next-label {
+  font-size: var(--font-size-micro);
+  color: var(--color-text-secondary);
+}
+
+.pp__note-next-value {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+}
+
+.pp__mistake-hint {
+  margin: 0;
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+}
+
+/* ---------------- 按住提示（§10.5 引导 / §43 L2） ----------------
+   填充条沿用 .pp__progress 的语言（轨道 + --skin-guide 填充），
+   不引入新的视觉体系（§51 动效预算：本页已经有琴键动画与进度动画）。
+
+   ⚠️ 这是「时长」的视觉，不是闸门：琴键始终可弹（§44）。 */
+
+.pp__hold {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  /* 和「再试一次」那行同高，避免出现/消失时把键盘挤动（§53 布局稳定） */
+  height: 22px;
+}
+
+.pp__hold-label {
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.pp__hold-track {
+  width: 112px;
+  height: 6px;
+  border-radius: var(--radius-sm);
+  background: var(--color-track);
+  overflow: hidden;
+}
+
+.pp__hold-bar {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-sm);
+  background: var(--skin-guide);
+  /* 静止态是「空」；填充由动画走到「满」（见下） */
+  transform: scaleX(0);
+  transform-origin: left center;
+  /* 时长是每题的**数据**（音值 × 拍速），由 --pp-hold-ms 传入；
+     linear 而不是缓动：它表示流逝的时间，不是状态切换 */
+  animation: pp-hold-fill var(--pp-hold-ms, 600ms) linear forwards;
+}
+
+@keyframes pp-hold-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* §13.4 / §13.2：减少动效时不做连续填充。
+   连续填充在这里承载「还剩多久」的信息，压成 1ms 会变成一根永远满的条，
+   反而说错话。改成只靠 §10.5 的两级引导（等 / 可以弹）表达。 */
+@media (prefers-reduced-motion: reduce) {
+  .pp__hold-bar {
+    animation: none;
+  }
+}
+
+.app[data-reduced-motion='true'] .pp__hold-bar {
+  animation-name: none;
+}
+
+.pp__idle-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+
+
+.pp__idle-main {
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-weight-semibold);
+}
+
+.pp__idle-sub {
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+}
+
+.pp__listen-hint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-h2);
+  color: var(--color-text-secondary);
+}
+
+.pp__listen-icon {
+  color: var(--skin-guide);
+}
+
+.pp__keyboard {
+  min-height: 0;
+  display: flex;
+  min-width: 0;}
+
+.pp__keyboard > * {
+  flex: 1 1 auto;
+  min-width: 0;}
+
+.pp__progress {
+  height: 6px;
+  border-radius: var(--radius-sm);
+  background: var(--color-track);
+  overflow: hidden;
+}
+
+.pp__progress-bar {
+  height: 100%;
+  border-radius: var(--radius-sm);
+  background: var(--skin-guide);
+  transition: width var(--motion-reward) var(--ease-standard);
+}
+
+/* ---------------- 底部栏（一行） ---------------- */
+
+.pp__bottom {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--tap-target);
+  flex-wrap: nowrap;
+}
+
+
+
+
+
+
+
+.pp__bottom-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1 1 auto;
+  justify-content: center;
+}
+
+.pp__stats {
+  display: flex;
+  gap: var(--space-2);
+  flex: 0 0 auto;
+}
+
+/* 达到真实钢琴白键尺寸（23.5mm）时明确标出来 */
+.pp__keysize--real {
+  background: var(--color-success-soft);
+  color: var(--color-success-strong);
+}
+
+/* ---------------- 完成页 ---------------- */
+
+.pp-result {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  background: var(--color-scrim);
+  backdrop-filter: blur(3px);
+  animation: pp-result-in var(--motion-page) var(--ease-standard);
+}
+
+@keyframes pp-result-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.pp-result__card {
+  width: min(560px, 100%);
+  max-height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-5) var(--space-4);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-overlay);
+  text-align: center;
+  animation: pp-card-in var(--motion-reward) var(--ease-standard);
+}
+
+@keyframes pp-card-in {
+  from {
+    transform: translateY(18px) scale(0.96);
+  }
+  to {
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 完成页（开发规划 4.3）。
+   ⚠️ 这一组类名是**精简过**的：歌名行、大号「准确度/用时」数字面板、
+   勋章 pill 墙都已删除 —— 前两个是「考试报告」的视觉语言，第三个是 §3.3 禁止的 Badge 墙。
+   加回任何一个之前请先读 ResultOverlay 顶部的注释。 */
+
+/* 完成页的核心标题：整页唯一的一级标题（§6.3 的 48–56px 档）。
+   注意它也被小横屏的 token 覆盖影响 —— 见本文件末尾 @media 里的 .pp-result。 */
+.pp-result__title {
+  margin: 0;
+  font-size: var(--font-size-display);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-none);
+}
+
+.pp-result__stars {
+  display: flex;
+  gap: var(--space-3);
+  /* §6.3：图形型状态不超过标题级上限 */
+  font-size: var(--font-size-display);
+  line-height: var(--line-height-none);
+}
+
+.pp-result__star {
+  color: var(--color-text-faint);
+  transform: scale(0.8);
+  transition: color var(--motion-reward) var(--ease-standard), transform var(--motion-reward) var(--ease-standard);
+}
+
+.pp-result__star.is-on {
+  color: var(--color-warning);
+  transform: scale(1);
+}
+
+/* 我表现怎么样：一行说完。数字用等宽数字避免跳动，但不做成大号面板 */
+.pp-result__facts {
+  margin: 0;
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.pp-result__gain {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-warning);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 新勋章：一句话，不做 pill 墙（§3.3） */
+.pp-result__earned {
+  margin: 0;
+  font-size: var(--font-size-label);
+  color: var(--color-text-secondary);
+}
+
+/* 新解锁：一行。材质样品本身仍然是主角（§46、§12.1），只是尺寸收敛到「信物」大小 */
+.pp-result__unlock {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3) var(--space-1) var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-soft);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-accent-strong);
+  transition: transform var(--motion-press) var(--ease-standard);
+}
+
+.pp-result__unlock:active {
+  transform: scale(0.98);
+}
+
+.pp-result__unlock-sample {
+  flex: 0 0 56px;
+  width: 56px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.pp-result__actions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+}
+
+/* 三个按钮尽量排成一行：竖屏 810px 下卡片内容宽约 492px */
+.pp-result__actions .ui-btn {
+  flex: 1 1 156px;
+}
+
+/* 「听我弹的」是次要动作，给它更小的份额 */
+.pp-result__replay {
+  flex: 1 1 126px;
+}
+
+.pp-result__exit {
+  font-size: var(--font-size-label);
+}
+
+/* 横屏高度吃紧：谱面再收一档，把高度留给琴键 */
+@media (orientation: landscape) {
+  .pp__staff {
+    max-height: 16vh;
+  }
+}
+
+/* ---------------- 横屏高度较小时压缩 ---------------- */
+
+@media (orientation: landscape) and (max-height: 560px) {
+  .pp__prompt {
+    min-height: 62px;
+  }
+
+  .pp__staff {
+    max-height: 20vh;
+  }
+
+  .pp-result__card {
+    padding: var(--space-5) var(--space-4) var(--space-3);
+    gap: var(--space-2);
+  }
+
+  /* 小横屏没有纵向空间放 42–56px 的核心标题：覆盖 token 来表达这件事，
+     而不是就地写一个 30px —— 字号只能来自 tokens.css（见 src/test/typography.test.ts）。
+     覆盖挂在 .pp-result 上，于是标题与星星一起缩放。 */
+  .pp-result {
+    --font-size-display: clamp(26px, 5vw, 34px);
+  }
+}
+
+/* ---------------- 竖屏 / 窄屏 ---------------- */
+
+@media (max-width: 640px) {
+  .pp__title-meta {
+    display: none;
+  }
+
+  .pp__bottom {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .pp__bottom-actions {
+    order: -1;
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pp-result,
+  .pp-result__card {
+    animation-duration: 1ms;
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "files": {
+    "src/features/home/home.css": [
+      { "selector": ".home__brand-name", "set": { "line-height": "var(--line-height-tight)" } }
+    ],
+    "src/features/practice/practice.css": [
+      { "selector": ".pp__title-name", "set": { "line-height": "var(--line-height-tight)" } }
+    ],
+    "src/features/challenges/challenges.css": [
+      { "selector": ".chl__title", "set": { "line-height": "var(--line-height-tight)" } }
+    ],
+    "src/features/tuning/tuning.css": [
+      { "selector": ".tune__title", "set": { "line-height": "var(--line-height-tight)" } },
+      { "selector": ".tune__panel-title", "set": { "line-height": "var(--line-height-tight)" } }
+    ],
+    "src/features/settings/settings.css": [
+      { "selector": ".settings__group-title", "set": { "line-height": "var(--line-height-tight)" } }
+    ],
+    "src/features/import/import.css": [
+      { "selector": ".im__heading", "set": { "line-height": "var(--line-height-tight)" } }
+    ],
+    "src/features/skins/skins.css": [
+      { "selector": ".wardrobe__preview-title", "set": { "line-height": "var(--line-height-tight)" } }
+    ]
+  }
+}

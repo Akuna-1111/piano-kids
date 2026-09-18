@@ -1,0 +1,106 @@
+/* ============================================================
+   App shell / 通用页面骨架
+   ============================================================ */
+
+.app {
+  height: 100%;
+  min-height: 100%;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.app[data-reduced-motion='true'] *,
+.app[data-reduced-motion='true'] *::before,
+.app[data-reduced-motion='true'] *::after {
+  animation-duration: 1ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 1ms !important;
+}
+
+.route-fallback {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  color: var(--color-text-secondary);
+}
+
+/* ---------------- 页面通用骨架 ---------------- */
+
+.page {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100%;
+  min-height: 0;
+}
+
+.page__bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  min-height: 64px;
+}
+
+.page__title {
+  flex: 1 1 auto;
+  margin: 0;
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  letter-spacing: 0.01em;
+}
+
+/* 顶栏里的按钮统一 44px。
+   不这么写的话：`.ui-btn` 的 56px 会把顶栏撑到 80px（12 + 56 + 12），
+   而首页顶栏是 64px —— 同一层级的顶栏不该每页高低不同（§4.2 空间系统 / §25 触控）。
+   44px 仍是 §25 的硬下限，顶栏里点得到的尺寸没有变小。 */
+.page__bar .ui-btn,
+.tune__top .ui-btn,
+.pp__top .ui-btn,
+.chl__top .ui-btn {
+  min-height: var(--tap-target-compact);
+}
+
+.page__body {
+  min-height: 0;
+  overflow: auto;
+  padding: 0 var(--space-4) max(var(--space-5), env(safe-area-inset-bottom));
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 顶部星星计数 / 设置按钮 */
+.hud-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-body);
+  transition: transform var(--motion-press) var(--ease-standard);
+}
+
+.hud-btn:active {
+  transform: scale(0.96);
+}
+
+.hud-btn--icon {
+  padding: 0;
+  width: 44px;
+  justify-content: center;
+}
+
+.hud-stars {
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 图标基类：在 flex 容器里由 align-items 对齐，在行内文本里按中线对齐 */
+.icon {
+  display: inline-block;
+  vertical-align: middle;
+  flex: 0 0 auto;
+}

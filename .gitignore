@@ -1,0 +1,35 @@
+# 依赖与构建产物
+node_modules/
+dist/
+dist-ssr/
+*.local
+# TypeScript 增量编译缓存（tsc -b 的产物，不该进版本管理）
+*.tsbuildinfo
+
+# 编辑器 / 系统
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+
+# 日志
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+logs/
+*.log
+
+# 测试与覆盖率
+coverage/
+.vitest/
+
+# 真机尺寸截图与几何读数（scripts/page-shot.mjs 的产物）
+.shots/
+
+# 字体源文件（868 KB，仅供 scripts/extract-bravura-glyphs.mjs 抽取字形用）
+# 抽取结果是 src/features/notation/bravuraGlyphs.ts，已纳入版本管理；
+# 需要重新生成时按脚本头部说明重新下载即可。
+.fontsrc/

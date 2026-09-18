@@ -1,0 +1,292 @@
+/* ============================================================
+   钢琴键盘 —— 双层布局 + 真实钢琴尺寸
+   白键层：流式排布；黑键层：绝对定位覆盖在白键之上。
+   所有颜色只来自皮肤层语义变量，基础 UI 不受影响。
+
+   尺寸：整块键盘的自然宽度由 --pk-natural-width 决定（按真实钢琴白键 23.5mm 算出）。
+   放得下时键盘居中、两侧留白（留白是内容，§55）；放不下时由 max-width 收回、
+   琴键等比压缩。内部的白键/黑键仍用百分比定位，所以两种情况下布局都正确。
+   ============================================================ */
+
+/* 外层负责测量、横向滚动与「选取区域」：
+   ── 键盘按真实尺寸算出来，**可以比这里宽**，所以这里可以横向拖动；
+   ── 溢出时不能用 justify-content: center 居中（会把左边裁掉且滚不到，
+      这是 flex + overflow 的已知行为），居中位置由 scrollLeft 决定。 */
+.pk-frame {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  /* 空白处横向拖动即可平移；键盘自身的 touch-action: none 保证按键不被滚动抢走 */
+  touch-action: pan-x;
+}
+
+.pk {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 150px;
+  display: block;
+  flex: 0 0 auto;
+  /* 触摸键盘时禁止滚动 / 缩放 / 双击放大，否则会抢走 pointer 事件 */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--skin-stage-bg);
+}
+
+/* 测量完成前不改变宽度，避免首帧跳动（§53 布局稳定性）。
+   注：**不加 min(100%, …) 的收窄** —— 真实尺寸优先，宽出屏幕交给拖动。 */
+.pk.is-sized {
+  width: var(--pk-natural-width, 100%);
+}
+
+/* 白键层与黑键层**各自建立层叠上下文**（z-index 1 / 2）。
+   这不是装饰：没有它，白键上的引导样式（`.pk-key.is-guide` 的 z-index: 3）
+   会翻到黑键上面去 —— 黑键被白键的键体切一半，看起来「黑白键交叉」，
+   而且那个黑键还按不下去（命中被白键抢走）。
+   有了层的 z-index，键级别的 z-index 只在**本层内部**竞争：
+   引导白键可以高于别的白键（描边不被邻居盖住），但永远高不过黑键层。 */
+.pk__whites {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.pk__blacks {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  /* 图层本身不接收命中，但里面的黑键要接收 —— elementFromPoint 会跳过 pointer-events:none */
+  pointer-events: none;
+}
+
+/* ---------------- 琴键通用 ---------------- */
+
+.pk-key {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 10px;
+  transition: background var(--motion-press) linear, transform var(--motion-press) var(--ease-standard),
+    box-shadow var(--motion-press) linear;
+  will-change: transform;
+}
+
+.pk-key--white {
+  flex: 0 0 auto;
+  height: 100%;
+  background: var(--skin-key-bg);
+  /* 真实钢琴白键之间有**看得见的缝**（约 1mm ≈ 3px），不是一根发丝线。
+     注意：box-sizing 是 border-box，所以加粗边框不会改变键的间距（122px 的音距不变），
+     只是把「可见键面」从 121px 收到 119px —— 这正是真琴的样子。 */
+  border-right: 3px solid var(--skin-key-border);
+  /* 前脸：白键前端是另一个面，比顶面暗 —— 这是「厚度」的来源。
+     12px 是让一块键在 122px 宽下仍然看得出厚度的下限（实测 4px 时像贴纸）。 */
+  border-bottom: 12px solid var(--skin-key-shadow);
+  border-radius: 0 0 7px 7px;
+  /* 单层中性接触阴影：键与键之间要有「一块块压在一起」的接触感。
+     §7.3：不用彩色发光、不在一个元素上叠多层阴影。 */
+  box-shadow: 0 2px 2px var(--skin-key-shadow);
+}
+
+.pk-key--white:first-child {
+  border-radius: 0 0 0 7px;
+}
+
+.pk-key--white:last-child {
+  border-right: none;
+  border-radius: 0 0 7px 0;
+}
+
+.pk-key--black {
+  position: absolute;
+  top: 0;
+  height: 62%;
+  pointer-events: auto;
+  background: var(--skin-key-black-bg);
+  border-radius: 0 0 6px 6px;
+  /* 黑键比白键高出一层：立体感来自**它落在白键上的阴影**（深色键本身画不出受光/背光两面）。
+     偏移 6px + 一点模糊 = 「立着的一块」，单层、中性色（§10.2 / §7.3）。 */
+  box-shadow: 0 6px 4px var(--skin-key-shadow);
+  z-index: 2;
+  padding-bottom: 6px;
+}
+
+/* ---------------- 按下态（输入反馈 50–150ms） ---------------- */
+
+.pk-key--white.is-pressed {
+  background: var(--skin-key-active);
+  /* 手指把键压下去：整体下沉 + 前脸同时变薄（同一个动作的两个表现）。
+     行程 5px / 前脸 12→4px：屏幕上一个键只有 780px 长，真实行程（约 10mm）放不下，
+     所以取「看得出来的最大行程」而不是按比例缩小。 */
+  transform: translateY(5px);
+  border-bottom-width: 4px;
+  /* 键已经贴到底，接触阴影跟着收掉 */
+  box-shadow: 0 0 0 var(--skin-key-shadow);
+  /* **按下比回弹快**：真实键盘按下约 20–40ms，回弹由手指决定、更慢。
+     基础规则的 90ms 管回弹，这条 45ms 管按下（transition-duration 只影响进入这条规则时）。 */
+  transition-duration: 45ms;
+}
+
+.pk-key--black.is-pressed {
+  background: var(--skin-key-black-active);
+  transform: translateY(4px);
+  box-shadow: 0 2px 2px var(--skin-key-shadow);
+  transition-duration: 45ms;
+}
+
+/* ---------------- 引导层（§10.5）----------------
+   状态用 outline 表达，box-shadow 只留给材质接触阴影 ——
+   避免在同一个元素上叠加多个 shadow（§7.3）。负 offset 让描边落在键体内部，不会被容器裁掉。
+
+   提示色分两个：--skin-guide 给浅色键面，--skin-guide-on-black 给深色键面。
+   一个颜色无法同时对浅键面与深键面达到 §47 要求的「高亮状态明确」，
+   而规范要求的是「高亮明确」，不是「高亮同色」。 */
+
+.pk-key.is-guide {
+  outline: 3px solid var(--skin-guide);
+  outline-offset: -3px;
+  z-index: 3;
+}
+
+.pk-key.is-next {
+  outline: 1px solid var(--skin-guide);
+  outline-offset: -2px;
+}
+
+.pk-key--black.is-guide {
+  outline-color: var(--skin-guide-on-black);
+}
+
+.pk-key--black.is-next {
+  outline-color: var(--skin-guide-on-black);
+}
+
+/* 手指提示点：低频、慢速的氛围式呼吸，不做高频闪烁 */
+.pk-key__finger {
+  position: absolute;
+  left: 50%;
+  /* 落在黑键带**下方**（黑键占顶部 62%）：提示点画在白键的下半部分，
+     既是孩子真正按的位置，也不会与黑键争夺层叠（否则会被黑键挡掉一半）。
+     取 18% 而不是更靠上，是因为提示点高度是**固定 26px**：键盘越矮它占的比例越大，
+     按最矮的键盘（.pk 的 min-height）算也必须整块落在黑键带下方。 */
+  bottom: 18%;
+  width: 26px;
+  height: 26px;
+  margin-left: -13px;
+  border-radius: 50%;
+  background: var(--skin-guide);
+  /* §7.3：不用彩色发光阴影，用中性接触阴影 */
+  box-shadow: var(--shadow-raised);
+  animation: pk-finger 1.5s var(--ease-gentle) infinite;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.pk-key--black .pk-key__finger {
+  background: var(--skin-guide-on-black);
+  bottom: calc(100% - 18%);
+  width: 20px;
+  height: 20px;
+  margin-left: -10px;
+}
+
+@keyframes pk-finger {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+/* ---------------- 判定反馈（状态反馈 300–700ms） ---------------- */
+
+.pk-key.is-correct {
+  animation: pk-correct var(--motion-reward) var(--ease-standard);
+}
+
+.pk-key.is-wrong {
+  animation: pk-wrong var(--motion-page) var(--ease-standard);
+}
+
+@keyframes pk-correct {
+  0% {
+    background: var(--skin-key-active);
+  }
+  35% {
+    background: var(--color-correct-flash);
+  }
+  100% {
+    background: var(--skin-key-bg);
+  }
+}
+
+@keyframes pk-wrong {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-3px);
+  }
+  60% {
+    transform: translateX(3px);
+  }
+}
+
+.pk-key--black.is-correct {
+  animation: pk-correct-black var(--motion-reward) var(--ease-standard);
+}
+
+@keyframes pk-correct-black {
+  0% {
+    background: var(--skin-key-black-active);
+  }
+  35% {
+    background: var(--color-correct-flash-on-black);
+  }
+  100% {
+    background: var(--skin-key-black-bg);
+  }
+}
+
+/* ---------------- 音名标签 ---------------- */
+
+.pk-key__label {
+  /* §6.3：儿童界面不能依赖 11px、10px 传达重要信息，下限锁在 12px */
+  font-size: var(--font-size-micro);
+  font-weight: var(--font-weight-semibold);
+  /* 音名颜色由皮肤提供，§47 要求「任何皮肤下音名可读」，由对比度单测强制 */
+  color: var(--skin-key-label);
+  letter-spacing: 0.03em;
+  pointer-events: none;
+}
+
+.pk-key--black .pk-key__label {
+  color: var(--skin-key-black-label);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pk-key__finger {
+    animation: none;
+  }
+  .pk-key.is-correct,
+  .pk-key.is-wrong,
+  .pk-key--black.is-correct {
+    animation-duration: 1ms;
+  }
+}

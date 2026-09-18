@@ -1,0 +1,10 @@
+{
+  "files": {
+    "src/app/app.css": [
+      { "selector": ".page__bar", "set": { "padding": "var(--space-2) var(--space-4)" } }
+    ],
+    "src/features/tuning/tuning.css": [
+      { "selector": ".tune__top", "set": { "padding": "var(--space-2) var(--space-4)" } }
+    ]
+  }
+}

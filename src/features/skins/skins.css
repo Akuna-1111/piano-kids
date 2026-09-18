@@ -1,0 +1,285 @@
+/* ============================================================
+   我的装扮 —— 琴键样品板（设计规范 §12）
+   ============================================================ */
+
+.wardrobe__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* ---------------- §12.1 当前星星成长值 ---------------- */
+
+.wardrobe__growth {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin: 0;
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.wardrobe__growth-label {
+  font-size: var(--font-size-label);
+  color: var(--color-text-secondary);
+}
+
+.wardrobe__growth-value {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-metric);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-warning);
+}
+
+/* ---------------- §12.1 琴键样品板 ----------------
+   横向排列，但用 auto-fill 自动换行而不是横向滚动（§54 明确点名装扮列表是
+   横向拖拽高发区：「能固定的固定，必须滚动的区域才滚动」）。 */
+
+.wardrobe__board {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: var(--space-3);
+}
+
+.sample {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  text-align: left;
+  transition: transform var(--motion-press) var(--ease-standard),
+    border-color var(--motion-button) linear;
+}
+
+.sample:active {
+  transform: scale(0.98);
+}
+
+.sample.is-active {
+  border-color: var(--color-accent);
+  outline: 2px solid var(--color-accent-soft);
+  outline-offset: 2px;
+}
+
+/* §12.2：未解锁不要用「灰度滤镜 + 锁图标」把材质盖住 ——
+   孩子需要看到它长什么样，才会有「还差一点就能拿到」的期待。
+   因此样品本身保持完整可辨，只用虚线边框 + 下沉底色表达「还没得到」。 */
+.sample.is-locked {
+  background: var(--color-surface-soft);
+  border-style: dashed;
+}
+
+.sample.is-locked .sample__name {
+  color: var(--color-text-secondary);
+}
+
+.sample__foot {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 var(--space-2) var(--space-1);
+  min-height: 40px;
+}
+
+.sample__name {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+}
+
+.sample__state {
+  font-size: var(--font-size-micro);
+  color: var(--color-text-secondary);
+}
+
+.sample.is-active .sample__state {
+  color: var(--color-accent);
+}
+
+.wardrobe__board-hint {
+  margin: var(--space-3) 0 0;
+  text-align: center;
+  font-size: var(--font-size-label);
+  color: var(--color-text-secondary);
+}
+
+/* ---------------- 琴键材质样品 ----------------
+   与真键盘共用同一套 --skin-* 变量与同一套双层结构（§10.3）：
+   白键层流式排布，黑键层绝对定位覆盖。
+   所以样品展示的就是那块材质本身，而不是对它的描述。 */
+
+.skin-sample {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 52px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--skin-stage-bg);
+}
+
+.skin-sample__whites {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.skin-sample__white {
+  flex: 1 1 0;
+  background: var(--skin-key-bg);
+  border-right: 1px solid var(--skin-key-border);
+  border-bottom: 3px solid var(--skin-key-shadow);
+}
+
+.skin-sample__white:last-child {
+  border-right: none;
+}
+
+.skin-sample__blacks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.skin-sample__black {
+  position: absolute;
+  top: 0;
+  width: 15%;
+  height: 62%;
+  background: var(--skin-key-black-bg);
+  border-radius: 0 0 3px 3px;
+  box-shadow: 0 1px 2px var(--skin-key-shadow);
+}
+
+/* ---------------- §10.9 试弹 ---------------- */
+
+.wardrobe__preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--skin-stage-bg);
+  border: 1px solid var(--color-border);
+}
+
+.wardrobe__preview-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  /* §53 布局稳定：皮肤名与说明长短不一，预留高度避免顶动下面的琴键 */
+  min-height: 64px;
+}
+
+.wardrobe__preview-info {
+  min-width: 0;
+}
+
+.wardrobe__preview-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+
+/* §46：皮肤是材质，不是颜色主题 —— 把材质名直接说出来 */
+.wardrobe__material {
+  padding: 2px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-soft);
+  font-size: var(--font-size-micro);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.wardrobe__preview-desc {
+  margin: 2px 0 0;
+  font-size: var(--font-size-label);
+  color: var(--color-text-secondary);
+}
+
+.wardrobe__preview-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.wardrobe__keys {
+  height: clamp(140px, 22vh, 200px);
+  min-width: 0;}
+
+.wardrobe__footnote {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-micro);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+.wardrobe__toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(28px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  padding: 12px 22px;
+  border-radius: var(--radius-md);
+  background: var(--color-text);
+  color: var(--color-surface);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  animation: wardrobe-toast-in var(--motion-reward) var(--ease-standard);
+  z-index: 50;
+}
+
+@keyframes wardrobe-toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* ---------------- 宽屏：样品与试弹并排 ---------------- */
+
+@media (min-width: 1000px) {
+  .wardrobe__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    align-items: start;
+    column-gap: var(--space-5);
+  }
+
+  .wardrobe__growth,
+  .wardrobe__footnote {
+    grid-column: 1 / -1;
+  }
+
+  .wardrobe__preview {
+    position: sticky;
+    top: var(--space-4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wardrobe__toast {
+    animation-duration: 1ms;
+  }
+}

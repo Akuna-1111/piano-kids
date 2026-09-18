@@ -1,0 +1,79 @@
+{
+  "global": {
+    "weight": {
+      "600": "var(--font-weight-semibold)",
+      "500": "var(--font-weight-medium)",
+      "400": "var(--font-weight-regular)"
+    },
+    "lineHeight": {
+      "1": "var(--line-height-none)",
+      "1.2": "var(--line-height-tight)",
+      "1.45": "var(--line-height-body)",
+      "1.5": "var(--line-height-body)",
+      "1.6": "var(--line-height-relaxed)",
+      "1.7": "var(--line-height-relaxed)"
+    }
+  },
+  "files": {
+    "src/features/home/home.css": [
+      { "selector": ".home__brand-name", "set": { "font-size": "var(--font-size-h1)" } },
+      { "selector": ".home__card--primary", "removeRule": true },
+      { "selector": ".home__card-icon", "removeRule": true },
+      { "selector": ".home__card--primary .home__card-icon", "removeRule": true },
+      { "selector": ".home__card-title", "removeRule": true },
+      { "selector": ".home__card-desc", "removeRule": true },
+      { "selector": ".home__card--primary .home__card-desc", "removeRule": true },
+      { "selector": ".home__recent-label", "removeRule": true },
+      { "selector": ".home__recent-list", "removeRule": true },
+      { "selector": ".home__recent-chip", "removeRule": true },
+      { "selector": ".home__recent-check", "removeRule": true },
+      { "selector": ".home__recent-chip:active", "removeRule": true }
+    ],
+    "src/features/practice/practice.css": [
+      { "selector": ".pp__title-name", "set": { "font-size": "var(--font-size-h1)" } },
+      { "selector": ".pp__top", "set": { "min-height": "64px" } },
+      { "selector": ".pp-result__title", "removeRule": true },
+      { "selector": ".pp-result__stars", "set": { "font-size": "var(--font-size-display)" } }
+    ],
+    "src/features/challenges/challenges.css": [
+      { "selector": ".chl__title", "set": { "font-size": "var(--font-size-h1)" } },
+      { "selector": ".chl__top", "set": { "min-height": "64px" } },
+      { "selector": ".chl__combo-value", "set": { "font-size": "var(--font-size-metric)" } },
+      { "selector": ".chl__result-value", "set": { "font-size": "var(--font-size-metric)" } },
+      { "selector": ".chl__track", "set": { "max-width": "var(--measure-narrow)" } }
+    ],
+    "src/features/tuning/tuning.css": [
+      { "selector": ".tune__title", "set": { "font-size": "var(--font-size-h1)" } },
+      { "selector": ".tune__top", "set": { "min-height": "64px" } },
+      { "selector": ".tune__sub", "set": { "font-size": "var(--font-size-label)" } },
+      { "selector": ".tune__panel-title", "set": { "font-size": "var(--font-size-h2)" } },
+      { "selector": ".tune__trace-note", "set": { "font-size": "var(--font-size-label)" } },
+      { "selector": ".tune__bars-count", "set": { "font-size": "var(--font-size-label)" } }
+    ],
+    "src/features/settings/settings.css": [
+      { "selector": ".settings__group-title", "set": { "font-size": "var(--font-size-h2)" } },
+      { "selector": ".settings__stats dd", "set": { "font-size": "var(--font-size-label)" } },
+      { "selector": ".settings__body", "set": { "max-width": "var(--content-max-width)" } }
+    ],
+    "src/features/import/import.css": [
+      { "selector": ".im", "set": { "max-width": "var(--content-max-width)" } },
+      { "selector": ".im__heading", "set": { "font-weight": "var(--font-weight-semibold)" } }
+    ],
+    "src/features/songs/songs.css": [
+      { "selector": ".song-card__best", "set": { "font-size": "var(--font-size-label)" } }
+    ],    "src/features/notation/staff.css": [
+      { "selector": ".staff__reference text", "set": { "font-size": "var(--font-size-micro)" } }
+    ],
+    "src/features/piano/piano.css": [
+      { "selector": ".pk-key__label", "set": { "font-size": "var(--font-size-micro)" } },
+      { "selector": ".pk--25 .pk-key__label", "removeRule": true },
+      { "selector": ".pk--decorated::after", "removeRule": true }
+    ],
+    "src/styles/base.css": [
+      { "selector": ".ui-card", "removeRule": true },
+      { "selector": ".visually-hidden", "removeRule": true }
+    ],
+    "src/features/skins/skins.css": [],
+    "src/app/app.css": []
+  }
+}

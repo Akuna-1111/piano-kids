@@ -1,0 +1,87 @@
+/* ============================================================
+   五线谱
+   字形来自 Bravura（SMuFL 参考字体，SIL OFL 1.1，见 LICENSES/）。
+   谱号与音符是**实心雕刻字形**（用 fill），不是线性图标 ——
+   谱面是学习材料，这里遵循乐谱排版惯例而非 UI 图标规范（§8.2 约束的是图标）。
+   线条与符干用中性色，保证任何皮肤下都清晰可读（§47 可辨优先）。
+   ============================================================ */
+
+.staff {
+  display: block;
+  /* 铺满可用宽度：宽度决定整块谱面的缩放，所以宽 = 大（见 StaffNote 的 STAFF_WIDTH）。
+     高度由长宽比推出，上限交给页面（.chl__stage > .staff） */
+  width: 100%;
+  height: auto;
+  /* 标签块已经完整落在 viewBox 之内，这里不再是「显示得出来」的前提。
+     保留它只是为了万一有笔画略超字形盒时不被切。 */
+  overflow: visible;
+}
+
+/* 谱面上的三处「安静的标注」——谱线、线音名、简谱数字的方框 ——
+   统一用同一个中性色，理由一致：它们都承载信息，但都不该抢音符的注意力。
+   ⚠️ 不要退回 --color-text-tertiary（#9a9f97）：在舞台底色上只有约 2.6:1，
+   对「理解内容所必需的图形」（WCAG 1.4.11 要求 3:1）不够。 */
+.staff__lines line,
+.staff__ledger {
+  stroke: var(--color-text-tertiary-strong);
+  /* 线宽以 viewBox 单位计：线距为 12 时，1.1 ≈ 视觉上的一条细线 */
+  stroke-width: 1.1;
+  stroke-linecap: butt;
+}
+
+.staff__stem {
+  stroke: var(--color-text);
+  stroke-width: 1.9;
+  stroke-linecap: round;
+}
+
+/* 乐谱字形统一用文字色实心填充 */
+.staff__glyph path {
+  fill: var(--color-text);
+}
+
+.staff__reference text {
+  fill: var(--color-text-tertiary-strong);
+  font-size: var(--font-size-micro);
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei',
+    'Noto Sans SC', sans-serif;
+  text-anchor: start;
+  dominant-baseline: middle;
+}
+
+/* 音符正下方的标签：数字简谱 + 唱名拼音，与音符头同一 x。
+   ⚠️ 这里**不写 font-size** —— 字号是几何的一部分（决定基线位置与盒高），
+   由 staffLayout 的 LABEL_FONT_SIZE 通过 SVG 属性给出。
+   CSS 里的 font-size 会**盖住** SVG 属性（表现属性优先级最低），
+   两边一旦不一致，文字就会跑出计算好的盒子。 */
+.staff__labels {
+  text-anchor: middle;
+}
+
+.staff__label-box {
+  fill: none;
+  stroke: var(--color-text-tertiary-strong);
+  stroke-width: 1;
+}
+
+.staff__label-solfege {
+  fill: var(--color-text);
+  font-weight: var(--font-weight-semibold);
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei',
+    'Noto Sans SC', sans-serif;
+}
+
+/* 唱名拼音是**文字**，需要 4.5:1 ——
+   --color-accent 在舞台底色上只有 3.4–4.0:1，所以用它的深一档。
+   保住「拼音=绿色读音提示」这个设计意图，同时真的看得清。 */
+.staff__label-pinyin {
+  fill: var(--color-accent-strong);
+  font-weight: var(--font-weight-medium);
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei',
+    'Noto Sans SC', sans-serif;
+}
+
+/* 谱面直接铺在舞台底色上，不再有卡片外壳 ——
+   卡片会给出一块与内容无关的填充色块，而谱面本来就是「纸上的谱」，
+   自己就能立住（§3.3 不要把每个模块都做成卡片）。
+   尺寸由页面决定：见 challenges.css 的 `.chl__stage > .staff`。 */

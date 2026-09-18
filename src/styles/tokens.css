@@ -1,0 +1,159 @@
+/* ============================================================
+   Design Tokens — V3
+
+   ⚠️ 改这个文件（以及任何视觉相关的代码）之前，必须先读：
+      《儿童钢琴启蒙网页应用_设计规范_V3.0.md》
+   执行流程与检查清单见仓库根目录的 AGENTS.md。
+
+   命名与取值依据：
+     §5.1  基础色板（不得擅自引入新的主色体系）
+     §4.2  空间级数 4 / 8 / 12 / 16 / 24 / 32 / 48 / 64
+     §7.1  圆角 8 / 12 / 16 / 20，大型容器最多 20px
+     §7.3  阴影只用接触阴影，禁止彩色发光与叠加
+     §6.3  字号层级（儿童界面最小 12px）
+     §6.4  字重只用 400 / 500 / 600
+     §13.2 动效时长分档
+     §13.3 Easing
+     §25   触控目标
+
+   分两层：基础层（永远稳定）/ 皮肤层（只允许皮肤覆盖 --skin-* 这组变量）。
+   皮肤禁止重写基础层，保证换皮肤不会像换产品（§11.1）。
+   ============================================================ */
+
+:root {
+  /* ---- 基础层：色板（§5.1 基准值，明亮中性温暖）---- */
+  --color-bg: #f7f7f3;
+  --color-surface: #ffffff;
+  --color-surface-soft: #f1f2ee;
+  --color-text: #252824;
+  --color-text-secondary: #6f746d;
+  --color-text-tertiary: #9a9f97;
+  --color-text-on-accent: #ffffff;
+  --color-border: #e3e5df;
+  --color-border-strong: #d0d4cc;
+  --color-accent: #4c8a67;
+  --color-accent-soft: #e5f0e8;
+  --color-success: #4d8a62;
+  --color-success-soft: #e8f1ea;
+  --color-warning: #b98232;
+  --color-danger: #b4574d;
+
+  /* ---- 派生色 ----
+     ⚠️ 不用 CSS color-mix()：它需要 Safari 16.2+，而目标设备可能是 iPadOS 15/16.0。
+        这些值在这里显式定义，换来的是老设备上不会整条声明失效。 */
+  --color-text-tertiary-strong: #83887f;
+  --color-text-faint: #d5d7d2;
+  --color-text-on-accent-soft: rgba(255, 255, 255, 0.84);
+  --color-text-on-accent-muted: rgba(255, 255, 255, 0.72);
+  --color-border-soft: #eceee9;
+  --color-accent-border: #a8c4b3;
+  /* --color-accent (#4c8a67) 在浅色背景上只有约 3.4–4.0:1，不够做**文字**（需 4.5:1）。
+     所以另给一个「当文字用」的更深一档；背景/描边仍然用 --color-accent。
+     谱面上的唱名拼音用它，见 staff.css 与 staff.contrast.test.ts。 */
+  --color-accent-strong: #3a6b4e;
+  --color-success-border: #a9c6b2;
+  --color-success-strong: #406f52;
+  --color-danger-soft: #f7e9e7;
+  --color-track: #e3e5df;
+  --color-scrim: rgba(37, 40, 36, 0.42);
+  /* 判定反馈：着色固定语义色，不随皮肤变化（§5.3 高饱和色允许用于成功反馈） */
+  --color-correct-flash: #cfe8d8;
+  --color-correct-flash-on-black: #4d8a62;
+
+  /* ---- 空间（§4.2）---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* ---- 圆角（§7.1：大型容器最多 20px）---- */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  /* 仅用于真正的「胶囊标签」，不要所有元素都用（§7.1） */
+  --radius-pill: 999px;
+
+  /* ---- 阴影（§7.3：像真实物体产生的接触阴影）---- */
+  --shadow-contact: 0 1px 2px rgba(25, 30, 25, 0.05);
+  --shadow-raised: 0 2px 5px rgba(25, 30, 25, 0.07);
+  --shadow-overlay: 0 8px 24px rgba(25, 30, 25, 0.1);
+
+  /* ---- 字号层级（§6.3）----
+     层级表（改字号前先对号入座，不要新造数值；守卫见 src/test/typography.test.ts）：
+       一级 · 页面核心标题   display
+       一级 · 页面标题       h1
+       二级 · 主要状态数字   metric
+       二级 · 区块标题/主操作 h2
+       三级 · 正文           body
+       三级 · 辅助文字       label
+       四级 · 最小说明       micro（下限，不再更小） */
+  --font-size-display: clamp(42px, 6.4vw, 56px); /* 页面 / 歌曲核心标题 */
+  --font-size-metric: clamp(32px, 4.4vw, 40px); /* 主要状态数字 */
+  --font-size-h1: clamp(24px, 3vw, 28px); /* 页面标题 */
+  --font-size-h2: clamp(18px, 2.2vw, 20px); /* 区块标题 / 主操作文字 */
+  --font-size-body: 16px; /* 常规文字 */
+  --font-size-label: 14px; /* 辅助文字 */
+  --font-size-micro: 12px; /* 极少量说明文字（下限，不再更小） */
+
+  /* ---- 行高（原本散落 1 / 1.2 / 1.35 / 1.45 / 1.5 / 1.6 / 1.7 七个原值）---- */
+  --line-height-none: 1; /* 大号数字与单行大标题，不需要额外行距 */
+  --line-height-tight: 1.25; /* 标题 */
+  --line-height-body: 1.5; /* 正文（body 默认） */
+  --line-height-relaxed: 1.65; /* 多行说明、脚注、等宽简谱 */
+
+  /* ---- 版心（§4.1：内容不与边缘贴死，也不无限拉宽）---- */
+  --content-max-width: 720px; /* 工具页正文列（曲目 / 装扮 / 设置 / 自检 / 导入） */
+  --measure-narrow: 560px; /* 居中提示文字的测量宽度，太宽会难读 */
+
+  /* ---- 字重（§6.4：只用 400 / 500 / 600）---- */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  /* ---- 动效时长（§13.2）---- */
+  --motion-press: 90ms; /* 80–120ms 按键反馈 */
+  --motion-button: 150ms; /* 120–180ms 按钮状态 */
+  --motion-panel: 220ms; /* 180–260ms 小面板出现 */
+  --motion-page: 320ms; /* 250–400ms 页面状态切换 */
+  --motion-reward: 520ms; /* 400–700ms 成长 / 解锁反馈 */
+
+  /* ---- Easing（§13.3）---- */
+  --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* 仅用于低频氛围动效（呼吸、漂浮），不用于状态反馈 */
+  --ease-gentle: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ---- 触控（§25：核心操作 ≥44px，主要按钮 ≥48px）---- */
+  --tap-target: 56px;
+  /* 顶栏 / 行内控件的尺寸：44px 是 §25 的硬下限，
+     顶栏里的按钮用它，顶栏才能全站统一为 64px 高 */
+  --tap-target-compact: 44px;
+
+  /* ---- 皮肤层默认值（未装备皮肤时的兜底 = 「原木」材质，§46）---- */
+  --skin-key-bg: linear-gradient(180deg, #fffdf9 0%, #fbf7f0 100%);
+  --skin-key-active: #ded3bd;
+  --skin-key-border: #d9cdb6;
+  --skin-key-shadow: rgba(74, 58, 34, 0.2);
+  --skin-key-label: #6b5b45;
+  --skin-key-black-bg: #3a342a;
+  --skin-key-black-active: #5c5342;
+  --skin-key-black-label: #e8dfce;
+  --skin-guide: #a9662f;
+  --skin-guide-on-black: #e8b071;
+  --skin-stage-bg: radial-gradient(120% 120% at 50% 0%, #fdfbf7 0%, #efe9de 100%);
+  --skin-decoration: #d9cdb6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-press: 1ms;
+    --motion-button: 1ms;
+    --motion-panel: 1ms;
+    --motion-page: 1ms;
+    --motion-reward: 1ms;
+  }
+}

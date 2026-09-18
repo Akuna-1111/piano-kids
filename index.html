@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no"
+    />
+    <meta name="theme-color" content="#f7f7f3" />
+    <meta name="description" content="打开网页就能弹的儿童钢琴启蒙工具" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="小钢琴" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+    <title>小钢琴 · 打开即弹</title>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <!--
+      ★ 白屏兜底 ★
+      模块加载失败 / 语法不被支持 / 渲染期间抛错，React 都会卸载整棵树，
+      表现就是一片空白 —— 对家长和孩子来说没有任何可用的信息。
+
+      这段脚本（在模块之前同步执行，不依赖任何构建产物）做三件事：
+        1. 监听全局 error 与 unhandledrejection，把原因显示出来
+        2. 监听模块脚本自身的加载失败
+        3. 8 秒后如果 #root 仍然是空的，判定为「没能启动」并报出来
+
+      只要应用正常挂载（main.tsx 会设置 __pianoRunning），这里就完全不会介入。
+    -->
+    <script>
+      (function () {
+        var shown = false;
+
+        function render(title, detail) {
+          if (shown || window.__pianoRunning) return;
+          var root = document.getElementById('root');
+          if (!root) return;
+          shown = true;
+          root.innerHTML =
+            '<div style="max-width:36rem;margin:12vh auto;padding:0 1.5rem;' +
+            'font:16px/1.7 -apple-system,BlinkMacSystemFont,\'PingFang SC\',sans-serif;color:#252824">' +
+            '<h1 style="font-size:22px;margin:0 0 12px">小钢琴没能启动</h1>' +
+            '<p style="color:#6f746d;margin:0 0 16px">' +
+            '请把下面这段信息截图发给开发者，就能定位问题。</p>' +
+            '<pre style="background:#f1f2ee;border:1px solid #e3e5df;border-radius:12px;' +
+            'padding:14px;white-space:pre-wrap;word-break:break-word;font-size:13px;margin:0">' +
+            '<strong>' + title + '</strong>\n' + (detail || '(无更多信息)') + '\n\n' +
+            'UA: ' + navigator.userAgent + '\n' +
+            'viewport: ' + window.innerWidth + '×' + window.innerHeight + '\n' +
+            'dpr: ' + window.devicePixelRatio + '</pre>' +
+            '<p style="color:#6f746d;margin:16px 0 0">' +
+            '<a href="javascript:location.reload()" style="color:#4c8a67">重新加载</a></p>' +
+            '</div>';
+        }
+
+        window.__pianoShowError = render;
+
+        window.addEventListener('error', function (event) {
+          var err = event && event.error;
+          render('运行时错误', (err && (err.stack || err.message)) || (event && event.message));
+        });
+
+        window.addEventListener('unhandledrejection', function (event) {
+          var reason = event && event.reason;
+          render('未处理的 Promise 拒绝', (reason && (reason.stack || reason.message)) || String(reason));
+        });
+
+        // 模块加载失败（网络 / 语法）不会走上面的 error 事件，用超时兜底
+        setTimeout(function () {
+          var root = document.getElementById('root');
+          if (!root || root.childNodes.length > 0 || window.__pianoRunning) return;
+          render(
+            '页面 8 秒后仍然空白',
+            '模块可能加载失败，或浏览器不支持页面使用的语法。',
+          );
+        }, 8000);
+      })();
+    </script>
+
+    <script
+      type="module"
+      src="/src/main.tsx"
+      onerror="window.__pianoShowError && window.__pianoShowError('入口模块加载失败', 'src/main.tsx 无法加载或解析')"
+    ></script>
+  </body>
+</html>
