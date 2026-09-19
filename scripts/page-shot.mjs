@@ -58,6 +58,7 @@ function parseArgs(argv) {
     probe: /** @type {string | null} */ (null),
     script: /** @type {string | null} */ (null),
     url: /** @type {string | null} */ (null),
+    resolve: /** @type {string | null} */ (null),
   };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
@@ -75,6 +76,7 @@ function parseArgs(argv) {
     else if (arg === '--probe') options.probe = value;
     else if (arg === '--script') options.script = value;
     else if (arg === '--url') options.url = value;
+    else if (arg === '--resolve') options.resolve = value;
     else continue;
     i += 1;
   }
@@ -252,6 +254,10 @@ async function main() {
       '--autoplay-policy=no-user-gesture-required',
       '--force-device-scale-factor=1',
       `--window-size=${options.width},${options.height}`,
+      // 本地解析器有时拿不到域名（负缓存 / 污染），用 --resolve 明确指定即可，
+      // 不影响 TLS 校验（SNI 与证书仍按域名走）。
+      // 例：--resolve piano-kids.pages.dev:172.66.47.109
+      ...(options.resolve ? [`--host-resolver-rules=MAP ${options.resolve.replace(':', ' ')}`] : []),
       'about:blank',
     ],
     { stdio: 'ignore' },
