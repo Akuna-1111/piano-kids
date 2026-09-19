@@ -132,7 +132,7 @@ CSS / Design Token / 颜色 / 字体 / 字号 / 字重
 ```bash
 npm run dev        # 开发服务器
 npm run dev:reset  # 开发服务器（清空 Vite 转换缓存后启动）
-npm run test       # 562 个用例（冒烟 / 音色回归 / 音色预设 / 混音余量 / 设计规范守卫 / CSS 语法守卫 / 排版层级守卫 / 皮肤对比度 / 琴键物理尺寸 / 五线谱几何·出题分档·对比度 / 按住提示与采样 / 挑战页布局 / 长按规则 / 文档完整性 / 录音回放 / 滑奏 / 曲库适配与简谱往返 / 节拍判定 / 节拍器咔声 / 内容包校验与存储 / 键盘层叠）
+npm run test       # 566 个用例（冒烟 / 音色回归 / 音色预设 / 混音余量 / 设计规范守卫 / CSS 语法守卫 / 排版层级守卫 / 小屏适配守卫 / 皮肤对比度 / 琴键物理尺寸 / 五线谱几何·出题分档·对比度 / 按住提示与采样 / 挑战页布局 / 长按规则 / 文档完整性 / 录音回放 / 滑奏 / 曲库适配与简谱往返 / 节拍判定 / 节拍器咔声 / 内容包校验与存储 / 键盘层叠）
 npm run typecheck  # 严格模式，必须 0 error
 npm run build      # 生产构建
 npm run icons      # 重新生成 PWA 图标
@@ -621,3 +621,46 @@ voice → pianoBus(余量 0.35) → dry + reverb → limiter（减少饱和）�
   完成页的核心标题掉回继承字号，**是新加的守卫当场抓到的**（`.pp-result__title 是（无 font-size）`）
 - 量排版用 `npm run shot -- "#/settings" --script scripts/flows/typography.js`
   （输出各层级实际字号、顶栏高度、版心、溢出与被裁文字）
+
+---
+
+## 19. 小屏不是「缩小版」，是按 §56 的顺序删与压
+
+**小屏的两种故障形态**（都实测过，且都**只在小屏出现**）：
+
+| 形态 | 实测 |
+| --- | --- |
+| **纵向放不下** | `.chl` 是三行 grid（顶栏 / 舞台 / 底栏），底栏是**核心按钮不能删**；667×375 时舞台只有 219px 而内容要 383px → 溢出 84px，提示行被推出屏幕，键盘掉到 150px 兜底 |
+| **横向被撑宽** | `.pp__top-actions` 是 `flex: 0 0 auto`，把**整页最小宽度**顶到 540px → 320 视口下页面 556px，「听一遍 / 速度档 / 开始跟弹 / 严格一点 / 清空成长数据」全被挤出屏幕（**点不到**） |
+
+**顺序照 §56 来**：装饰 → 次要说明 → 次要数据 → 次要入口；
+**绝不优先压缩**琴键尺寸 / 当前任务 / 核心按钮 / 触控区域。落地时依次是：
+
+1. **顶栏收高**（64 → 48，`@media (max-height: 560px)`）—— 栏内控件仍是 44px（§25）
+2. **次级说明让位**（`.chl__sub { display: none }`、「刚才的音」行）
+3. **行间距与固定高度**（`.chl__prompt` 的 96px 固定高放开、gap 12 → 8）
+4. **谱面改成高度驱动**（`height: clamp(48px, 18vh, 116px); width: auto`）——
+   原先 `width: 100%` + `max-height` 会把 3.8:1 的谱面压成一条细带，音符小到看不清；
+   高度驱动时宽度按比例跟着走，小屏**反而更清楚**
+5. **最后才动键盘的纵向长度**（`clamp(112px, 30vh, 150px)`）—— 触控宽度仍是真实 23.5mm、横向可拖动
+
+三条容易漏的细节：
+
+- **`.pk` 自带 `min-height: 150px`**：容器被收矮后它不肯缩，于是溢出容器、被 `overflow: hidden`
+  裁掉一截（键的下缘与音名都被切）。小屏必须同时写 `.chl__keyboard .pk { min-height: 0 }`
+- **只写 `flex-wrap: wrap` 不会换行**：`.pp__stats` 自己是 `flex: 0 0 auto`，会按最大内容宽
+  （382px）定宽。必须同时给 `flex: 0 1 auto` + `min-width: 0`
+- **分段控件那一行**（设置页「标签 + 分段控件」最小内容宽 313px > 320 视口的可用 288px）
+  要把 `.settings__row` 改成可换行，否则档位按钮被挤出屏幕
+
+**验收方式**（jsdom 看不见这些，只能靠真实布局引擎）：
+
+```bash
+npm run shot -- "#/challenges/staff" --click 开始 --script scripts/flows/challenge-layout.js --width 667 --height 375
+npm run shot -- "#/practice/mary-lamb" --script scripts/flows/overflow-hunt.js --width 320 --height 568
+```
+
+`challenge-layout.js` 用 `elementFromPoint` 在谱面中心与四角做命中测试（直接问「谁在上面」），
+`overflow-hunt.js` 列出把页面撑宽的元凶与被挤出屏幕的按钮。
+矩阵至少覆盖：**320×568 / 375×667 / 667×375 / 844×390 / 810×1080 / 1080×810**。
+关键声明由 `src/test/small-screen.test.ts` 守着（jsdom 里媒体查询不生效，只能守声明）。

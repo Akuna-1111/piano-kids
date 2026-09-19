@@ -21,7 +21,7 @@
 | 技术栈 | Vite 6 + React 18 + TypeScript 严格模式 + Vitest；包管理器 **npm**（不是 pnpm） |
 | 浏览器下限 | **Safari 15 / iPadOS 15**；`esbuild.target` 与 `build.target` 都是 `es2019` |
 | `npm run typecheck` | 0 error（`noUnusedLocals` / `noUnusedParameters` 开启） |
-| `npx vitest run` | **561 通过 / 37 文件** |
+| `npx vitest run` | **566 通过 / 38 文件** |
 | `npm run build` | 通过（**不应有任何 CSS 语法警告**，见 §3 的样式守卫） |
 | 离线音频探针 | 削波 **0/24** 场景；三套音色响度差 0 / 0.1 / 0.5 dB；琴体频谱平均差 5.4 dB |
 

@@ -505,6 +505,52 @@
     order: -1;
     width: 100%;
   }
+
+  /* 顶栏也折成两行。不折行时 `.pp__top-actions`（flex: 0 0 auto）会把
+     **整页的最小宽度**顶到 540px —— 实测 320 视口下页面被撑到 556px，
+     「听一遍 / 慢·正好·快 / 开始跟弹」全被挤出屏幕（看不见也点不到）。
+     折行后一个按钮都不删（§56 核心按钮不删），只是换行。 */
+  .pp__top {
+    flex-wrap: wrap;
+    row-gap: var(--space-2);
+  }
+
+  .pp__top-actions {
+    flex: 1 1 100%;
+    justify-content: space-between;
+  }
+
+  /* 速度档收一档内边距，让它在 320px 宽也能整行放下 */
+  .pp__tempo-btn {
+    padding: 9px 12px;
+  }
+
+  /* 键宽读数（两个 pill 并排，最大内容宽 382px）在小屏换行而不是把页面撑宽。
+     ⚠️ 只写 flex-wrap 不够：`.pp__stats` 自己是 `flex: 0 0 auto`，
+     会按**最大内容宽**定宽，于是永远不会触发换行 —— 必须同时允许它收缩。
+     先换行、保留信息；只有更窄时才需要按 §56 的「次要数据」删掉。 */
+  .pp__stats {
+    flex: 0 1 auto;
+    min-width: 0;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+/* 小高度（手机横屏）：说明不占固定高，键盘内层跟着容器走（§24 / §56） */
+@media (max-height: 560px) {
+  .pp__prompt {
+    min-height: 0;
+  }
+
+  /* `.pk` 自带 min-height: 150px；容器更矮时它会溢出容器并被裁掉一截 */
+  .pp__keyboard .pk {
+    min-height: 0;
+  }
+
+  .pp__keyboard {
+    min-height: clamp(112px, 30vh, 150px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

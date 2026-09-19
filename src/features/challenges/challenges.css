@@ -314,3 +314,114 @@
   color: var(--color-accent);
   border-color: var(--color-accent-border);
 }
+
+/* ============================================================
+   小屏适配（§24 响应式 20.1 断点策略 / §56 响应式优先级）
+   ------------------------------------------------------------
+   为什么需要：`.chl` 是三行 grid（顶栏 / 舞台 / 底栏），底栏放的是**核心按钮**
+   （开始 · 再玩一次 · 听一下），按 §56 不能删。于是小高度屏幕上舞台被挤得很窄，
+   内容直接纵向溢出（实测改造前）：
+
+     667×375  舞台只有 219px，内容要 383px → 溢出 84px，提示行被推出屏幕
+     844×390  溢出 75px ｜ 听音找键 46px ｜ 节拍挑战 25px
+     键盘则全部掉到 150px 兜底高度
+
+   §56 的删除顺序是「装饰 → 次要说明 → 次要数据 → 次要入口」，
+   绝不优先压缩「琴键尺寸 / 当前任务 / 核心按钮 / 触控区域」。
+   所以这里依次压缩：顶栏高度 → 说明文字 → 行间距 → 谱面的取高方式，
+   最后才把**琴键的纵向长度**收到 112px（触控宽度仍是真实 23.5mm、横向可拖动，见 AGENTS §7）。
+
+   谱面改成「高度驱动」是关键：原先 `width: 100%` + `max-height` 会让一个
+   3.8:1 的谱面被压成一条细带（两侧全是空白、音符小到看不清）；
+   现在由高度决定大小、宽度按比例跟着走，小屏上反而更清楚。
+   ============================================================ */
+
+@media (max-height: 560px) {
+  .chl {
+    gap: var(--space-2);
+    padding: 0 var(--space-3) max(var(--space-2), env(safe-area-inset-bottom));
+    /* 这一档之后还是放不下（极窄横屏）时允许纵向滚动兜底，而不是把内容裁掉 */
+    overflow-y: auto;
+  }
+
+  /* 顶栏收 16px，栏内控件仍是 44px（§25 核心操作 ≥44px） */
+  .chl__top {
+    min-height: 48px;
+  }
+
+  .chl__stage {
+    gap: var(--space-2);
+  }
+
+  /* 任务说明保留（当前任务不能删），但不再占 96px 的固定高度 */
+  .chl__prompt {
+    min-height: 0;
+    gap: var(--space-1);
+  }
+
+  .chl__headline {
+    font-size: var(--font-size-h2);
+  }
+
+  /* 次级说明整条去掉（§56 的「次要说明」） */
+  .chl__sub {
+    display: none;
+  }
+
+  .chl__stage > .staff {
+    height: clamp(48px, 18vh, 116px);
+    width: auto;
+    max-width: 100%;
+    max-height: none;
+    margin: 0 auto;
+  }
+
+  .chl__keyboard {
+    flex: 1 1 clamp(112px, 30vh, 150px);
+    min-height: clamp(112px, 30vh, 150px);
+  }
+
+  /* 「刚才的音」在小屏让位给谱面与键盘：同一个信息在键盘上已有反馈 */
+  .chl__target-hint {
+    display: none;
+  }
+
+  .chl__bottom {
+    min-height: 48px;
+  }
+
+  /* `.pk` 自带 `min-height: 150px`，容器被收到 112px 时它会溢出容器、被 `overflow: hidden`
+     裁掉一截（键的下缘与音名都会被切）。这里让它跟着容器走。 */
+  .chl__keyboard .pk {
+    min-height: 0;
+  }
+
+  /* 节拍挑战：拍点轨道是**当前任务**（不能删），但 76px 的固定高度 + 35px 的连击数字
+     在小屏上会把舞台吃光，所以轨道与连击数字各收一档。 */
+  .chl__track {
+    height: clamp(44px, 13vh, 76px);
+  }
+
+  .chl__combo-value {
+    font-size: var(--font-size-h1);
+  }
+}
+
+/* 手机竖屏 / iPad 分屏：标题与说明各降一档，避免两行挤掉舞台 */
+@media (max-width: 480px) {
+  .chl {
+    padding-inline: var(--space-3);
+  }
+
+  .chl__title {
+    font-size: var(--font-size-h2);
+  }
+
+  .chl__headline {
+    font-size: var(--font-size-h2);
+  }
+
+  .chl__rounds {
+    font-size: var(--font-size-micro);
+  }
+}
