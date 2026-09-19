@@ -57,6 +57,7 @@ function parseArgs(argv) {
     wait: 900,
     probe: /** @type {string | null} */ (null),
     script: /** @type {string | null} */ (null),
+    url: /** @type {string | null} */ (null),
   };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
@@ -73,6 +74,7 @@ function parseArgs(argv) {
     else if (arg === '--wait') options.wait = Number(value);
     else if (arg === '--probe') options.probe = value;
     else if (arg === '--script') options.script = value;
+    else if (arg === '--url') options.url = value;
     else continue;
     i += 1;
   }
@@ -226,7 +228,10 @@ const PROBE = `(() => {
 
 async function main() {
   const options = parseArgs(process.argv.slice(2));
-  const url = `http://127.0.0.1:5173/${options.hash}`;
+  // 默认打本机开发服务器；验线上（Cloudflare Pages 域名）时用 --url 指定，
+  // 例如：npm run shot -- "#/" --url https://piano-kids.pages.dev --script scripts/flows/pwa-check.js
+  const base = (options.url ?? 'http://127.0.0.1:5173').replace(/\/+$/, '');
+  const url = `${base}/${options.hash}`;
   const outDir = resolve(process.cwd(), '.shots');
   mkdirSync(outDir, { recursive: true });
   const outFile = resolve(outDir, options.out ?? 'shot.png');
