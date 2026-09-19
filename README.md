@@ -189,6 +189,16 @@ CSS 变量写到 App 根节点。皮肤只能覆盖 `--skin-*` 这 9 个变量�
 `npm run build` 产出 `dist/`，是纯静态站点（`base: './'`，可直接放到任意子路径）。
 Cloudflare Pages / Netlify / GitHub Pages 均可，构建命令 `npm run build`，输出目录 `dist`。
 
+**推荐 Cloudflare Pages**：连上 GitHub 仓库后每次推送自动重建，并自带免费 HTTPS 域名
+（`<项目名>.pages.dev`）。完整步骤（含构建配置、上线后要验的七件事、响应头与缓存的说明）
+见 [`docs/部署与发布.md`](./docs/部署与发布.md)。
+
+仓库里已为它准备好：
+
+- `.nvmrc` —— 构建用 Node 20（Cloudflare Pages 会读它，不用手设 `NODE_VERSION`）
+- `public/_headers` —— 带哈希的 `/assets/*` 长缓存、`sw.js` 与 `index.html` 不缓存、几条安全头
+- **路由是 hash 路由**（`#/settings`），所以**不需要** SPA 回退规则，也不存在深链 404
+
 Service Worker 只在生产构建中注册（`main.tsx` 里判断 `import.meta.env.PROD`），
 开发环境不注册，避免缓存干扰调试。
 

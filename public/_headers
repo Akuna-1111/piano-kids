@@ -1,0 +1,32 @@
+# Cloudflare Pages 响应头（本文件会被原样复制到 dist/ 并被 Pages 读取）
+#
+# 只做两件事：
+#   1. 静态资源长缓存 —— Vite 产物带内容哈希，文件名一变就是新 URL，所以可以 immutable
+#   2. 几条不依赖应用代码的安全头
+#
+# 故意**不**加 CSP：这个应用的键盘尺寸是运行时算出来的内联 style，
+# 还有 Web Audio 与 svg data-uri，一条没测过的 CSP 会直接把琴键弄坏。
+# 要加就得先在本机 `npx vite preview` 下逐页验一遍。
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# 图标与字体：文件名不带哈希，缓存短一些，改了能及时生效
+/icons/*
+  Cache-Control: public, max-age=86400
+
+/manifest.webmanifest
+  Cache-Control: public, max-age=86400
+  Content-Type: application/manifest+json
+
+# Service Worker 必须每次校验：否则用户会一直拿到旧版本
+/sw.js
+  Cache-Control: no-cache
+
+/index.html
+  Cache-Control: no-cache
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), camera=(), microphone=()
