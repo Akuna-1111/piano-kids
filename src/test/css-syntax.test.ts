@@ -72,4 +72,50 @@ describe('CSS 语法（防静默截断）', () => {
 
     expect(problems).toEqual([]);
   });
+
+  /**
+   * 静默截断的签名：**注释出现在选择器列表中间**。
+   *
+   * 批量脚本删掉一条规则的声明块时，会留下「选择器, 换行 选择器, 换行 + 下一条规则的注释」，
+   * 于是这些选择器被 CSS 合并进**下一条规则**：
+   *
+   * ```css
+   * /* 速度档的分段控件 *\/
+   * .pp__tempo,
+   *
+   * .pp__tempo-btn,
+   *
+   * .pp__tempo-btn.is-active,
+   *
+   * /* ---------------- 舞台 ---------------- *\/
+   * .pp__stage { display: grid; ... }     ← 速度档被套上了舞台的 grid
+   * ```
+   *
+   * 实测后果：练习页的速度档变成**竖排 3 行**，顶栏被撑高 110px，键盘少了 110px 高。
+   * 而它**语法完全合法** —— esbuild 不报警、括号也配平，页面不报错、测试全绿。
+   *
+   * 这个仓库从不把注释写进选择器列表，所以「注释之前还剩下真正的选择器文本」即损坏。
+   * （文件头注释 + 区块注释 + 选择器是正常写法，所以要先剥掉注释再判断。）
+   */
+  it('选择器列表里不夹注释（声明块被静默删掉会留下这个签名）', () => {
+    const offenders: string[] = [];
+
+    for (const file of files) {
+      const source = readFileSync(file, 'utf8');
+      const where = relative(SRC, file);
+      const re = /([^{}]*)\{/g;
+      let m: RegExpExecArray | null;
+      while ((m = re.exec(source))) {
+        const header = m[1];
+        const commentAt = header.lastIndexOf('/*');
+        if (commentAt === -1) continue;
+        const beforeComment = header.slice(0, commentAt).replace(/\/\*[\s\S]*?\*\//g, '').trim();
+        if (!beforeComment) continue;
+        const line = source.slice(0, m.index).split('\n').length;
+        offenders.push(`${where}:${line} 选择器「${beforeComment.split('\n').map((s) => s.trim()).filter(Boolean).join(' ')}」后面夹着注释 —— 声明块可能被删了`);
+      }
+    }
+
+    expect(offenders).toEqual([]);
+  });
 });

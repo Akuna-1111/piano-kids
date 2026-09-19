@@ -55,15 +55,35 @@
   flex: 0 0 auto;
 }
 
-/* 速度档的分段控件 */
-.pp__tempo,
+/* 速度档的分段控件 —— 与设置页的分段控件、节拍挑战的速度档同一套观感（§59：
+   同一个控件不该长出第二种外观）。
+   ⚠️ 这三个选择器曾被一次批量改样式的事故删掉了声明块，只剩以逗号结尾的悬空列表，
+   于是被并进下面 `.pp__stage` 的规则里：速度档变成**竖排 3 行**、还套上了舞台的 grid。
+   这种损坏**语法完全合法**，esbuild 与旧的语法守卫都不会报警 ——
+   现在由 `src/test/css-syntax.test.ts` 的「选择器列表里夹注释」检查守着（AGENTS §17）。 */
+.pp__tempo {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px;
+  background: var(--color-surface-soft);
+  border-radius: var(--radius-md);
+}
 
+.pp__tempo-btn {
+  padding: 9px 16px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  transition: background var(--motion-press) linear, color var(--motion-press) linear;
+}
 
-.pp__tempo-btn,
-
-
-.pp__tempo-btn.is-active,
-
+.pp__tempo-btn.is-active {
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-contact);
+}
 
 /* ---------------- 舞台 ---------------- */
 
